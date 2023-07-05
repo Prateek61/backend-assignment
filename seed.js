@@ -1,52 +1,74 @@
 const { PrismaClient } = require("@prisma/client");
-const { hashPassword } = require("./utils/auth.js");
-
 const prisma = new PrismaClient();
 
 async function seed() {
-  try {
-    // Create users
-    const users = [
-      {
-        email: "super@super.com",
-        name: "Super User",
-        password: await hashPassword("super"),
-        isAdmin: true,
-      },
-      {
-        email: "user1@example.com",
-        name: "User 1",
-        password: await hashPassword("password1"),
-      },
-      {
-        email: "user2@example.com",
-        name: "User 2",
-        password: await hashPassword("password2"),
-      },
-      {
-        email: "user3@example.com",
-        name: "User 3",
-        password: await hashPassword("password3"),
-      },
-      {
-        email: "user4@example.com",
-        name: "User 4",
-        password: await hashPassword("password4"),
-      },
-    ];
+  // Create admin user
+  const adminUser = await prisma.user.create({
+    data: {
+      email: "admin@example.com",
+      name: "Admin User",
+      password: "admin123",
+      isAdmin: true,
+    },
+  });
 
-    for (const user of users) {
-      await prisma.user.create({
-        data: user
-      });
-    }
-
-    console.log(`Seeded ${users.length} users successfully.`);
-  } catch (error) {
-    console.error("Error seeding data:", error);
-  } finally {
-    await prisma.$disconnect();
+  // Create other users
+  const users = [];
+  for (let i = 1; i <= 6; i++) {
+    const user = await prisma.user.create({
+      data: {
+        email: `user${i}@example.com`,
+        name: `User ${i}`,
+        password: `user${i}123`,
+      },
+    });
+    users.push(user);
   }
+
+  // Create products
+  const products = [];
+  const productCount = 12
+  for (let i = 1; i <= productCount; i++) {
+    const product = await prisma.product.create({
+      data: {
+        name: `Product ${i}`,
+        description: `Description for Product ${i}`,
+        price: getRandomFloat(10, 100),
+      },
+    });
+    products.push(product);
+  }
+
+  // Create orders
+  const orders = [];
+  const orderCount = 35
+  for (let i = 1; i <= orderCount; i++) {
+    const randomUser = users[getRandomInt(0, users.length - 1)];
+    const randomProduct = products[getRandomInt(0, products.length - 1)];
+    const order = await prisma.productOrder.create({
+      data: {
+        userId: randomUser.id,
+        productId: randomProduct.id,
+      },
+    });
+    orders.push(order);
+  }
+
+  console.log("Seeding completed successfully!");
 }
 
-seed();
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+seed()
+  .catch((error) => {
+    console.error("Error seeding database:", error);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
