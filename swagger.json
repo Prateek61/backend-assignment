@@ -1,94 +1,292 @@
 {
-    "swagger": "2.0",
-    "info": {
-      "title": "Products API",
-      "description": "API to manage products",
-      "version": "1.0.0"
-    },
-    "host": "localhost:3000",
-    "basePath": "/",
-    "schemas": ["http", "https"],
-    "consumes": ["application/json", "application/xml"],
-    "produces": ["application/json", "application/xml"],
-    "paths": {
-      "/login": {
-        "post": {
-          "description": "Logs in a user and returns a JWT token.",
-          "parameters": [
-            {
-              "name": "body",
-              "in": "body",
-              "description": "Request body containing email and password.",
-              "required": true,
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "description": "The email of the user."
-                  },
-                  "password": {
-                    "type": "string",
-                    "description": "The password of the user."
-                  }
+  "swagger": "2.0",
+  "info": {
+    "title": "Products API",
+    "description": "API to manage products",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http", "https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "summary": "User Login",
+        "description": "Logs in a user and returns a JWT token.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The user login credentials.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The email of the user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password of the user."
+                }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful login. Returns a JWT token.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "The JWT token."
                 }
               }
             }
-          ],
-          "responses": {
-            "200": {
-              "description": "Successful login. Returns a JWT token.",
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "description": "The JWT token."
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Bad request. Invalid or missing email/password fields."
-            },
-            "401": {
-              "description": "Unauthorized. Invalid credentials."
-            }
+          },
+          "400": {
+            "description": "Bad request. Invalid or missing email/password fields."
+          },
+          "401": {
+            "description": "Unauthorized. Invalid credentials."
           }
         }
       }
     },
-    "definitions": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
+    "/users": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Registers a new user.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The user details.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The email of the user."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The password of the user."
+                }
+              },
+              "required": ["email", "name", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully.",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid or missing user details."
+          },
+          "409": {
+            "description": "Conflict. User with the same email already exists."
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all users (paginated)",
+        "description": "Returns a list of all users, paginated.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page number of the user list.",
+            "required": false,
             "type": "integer",
-            "description": "The ID of the user."
+            "default": 1
           },
-          "email": {
-            "type": "string",
-            "description": "The email of the user."
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The maximum number of users per page.",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of users.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
           },
-          "username": {
-            "type": "string",
-            "description": "The username of the user."
+          "400": {
+            "description": "Bad request. Invalid query parameters."
           }
         }
       }
     },
-    "securityDefinitions": {
-      "BearerAuth": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header",
-        "description": "Bearer token authentication"
+    "/users/me": {
+      "get": {
+        "summary": "Get the authenticated user",
+        "description": "Returns the authenticated user.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of the authenticated user.",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid authentication token."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update the authenticated user",
+        "description": "Updates the details of the authenticated user.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The updated user details.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "description": "The updated email of the user."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The updated name of the user."
+                },
+                "password": {
+                  "type": "string",
+                  "description": "The updated password of the user."
+                }
+              },
+              "required": ["email", "name", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful update of the authenticated user.",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid or missing user details."
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid authentication token."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete the authenticated user",
+        "description": "Deletes the authenticated user.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion of the authenticated user.",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid authentication token."
+          }
+        }
       }
     },
-    "security": [
-      {
-        "BearerAuth": []
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "description": "Returns a user by their ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the user.",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of the user.",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid user ID."
+          },
+          "404": {
+            "description": "User not found."
+          }
+        }
       }
-    ]
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "The ID of the user."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email of the user."
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT authorization token in the format 'Bearer {token}'"
+    }
   }
-  
+}

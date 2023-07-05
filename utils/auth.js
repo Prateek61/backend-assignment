@@ -89,6 +89,13 @@ async function auth(req, res, next) {
                 id: decoded.id
             }
         });
+
+        if (!user) {
+            res.status(401).json({ error: "Invalid token" });
+            return;
+        }
+
+        req.user = user;
         next();
     } catch (error) {
         console.error("Error verifying JWT:", error);
