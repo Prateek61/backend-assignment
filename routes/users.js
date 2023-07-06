@@ -14,11 +14,11 @@
  */
 
 const express = require('express');
-const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const { hashPassword, auth } = require('../utils/auth.js');
-const { getPagination } = require('../utils/utils.js');
+const { getPagination } =  require('../utils/utils.js');
 
+const router = express.Router();
 const prisma = new PrismaClient();
 
 /**
@@ -107,11 +107,13 @@ router.post('/', async (req, res) => {
  *     parameters:
  *       - in: query
  *         name: page
+ *         default: 1
  *         schema:
  *           type: integer
  *         description: The page number.
  *       - in: query
  *         name: limit
+ *         default: 10
  *         schema:
  *           type: integer
  *         description: The number of items per page.

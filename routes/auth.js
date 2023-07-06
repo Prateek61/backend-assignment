@@ -1,8 +1,8 @@
 const express = require('express');
-const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const { comparePassword, generateJWT } = require('../utils/auth.js');
 
+const router = express.Router();
 const prisma = new PrismaClient();
 
 /**

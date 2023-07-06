@@ -26,11 +26,11 @@
  */
 
 const express = require('express');
-const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const { auth, admin } = require('../utils/auth.js');
 const { getPagination } = require('../utils/utils.js');
 
+const router = express.Router();
 const prisma = new PrismaClient();
 
 /**
