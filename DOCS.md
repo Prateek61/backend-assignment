@@ -1,3 +1,7 @@
+## Technologies used
+- express.js
+- prisma
+
 # How to run
 
 ## Initial setip
@@ -33,7 +37,7 @@ node seed.js
 npx prisma generate
 ```
 
-## Run the development server
+## Run the development server (localhost:3000)
 ```bash
 npm run dev
 ```
