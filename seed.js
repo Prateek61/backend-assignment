@@ -50,6 +50,7 @@ async function seed() {
       data: {
         userId: randomUser.id,
         productId: randomProduct.id,
+        price: randomProduct.price,
       },
     });
     orders.push(order);

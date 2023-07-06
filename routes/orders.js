@@ -138,7 +138,8 @@ router.post('/', auth, async (req, res) => {
                     connect: {
                         id: req.user.id
                     }
-                }
+                },
+                price: product.price
             }
         });
 
