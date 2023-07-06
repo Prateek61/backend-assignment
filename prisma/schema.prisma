@@ -27,6 +27,7 @@ model Product {
   name        String
   description String
   price       Float
+  isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   

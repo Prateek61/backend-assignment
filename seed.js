@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { hashPassword } = require('./utils/auth.js');
 
 async function seed() {
   // Create admin user
@@ -7,7 +8,7 @@ async function seed() {
     data: {
       email: "admin@example.com",
       name: "Admin User",
-      password: "admin123",
+      password: await hashPassword("admin123"),
       isAdmin: true,
     },
   });
@@ -19,7 +20,7 @@ async function seed() {
       data: {
         email: `user${i}@example.com`,
         name: `User ${i}`,
-        password: `user${i}123`,
+        password: await hashPassword(`user${i}123`),
       },
     });
     users.push(user);

@@ -7,9 +7,16 @@
   },
   "host": "localhost:3000",
   "basePath": "/",
-  "schemes": ["http", "https"],
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "paths": {
     "/auth/login": {
       "post": {
@@ -33,7 +40,10 @@
                   "description": "The password of the user."
                 }
               },
-              "required": ["email", "password"]
+              "required": [
+                "email",
+                "password"
+              ]
             }
           }
         ],
@@ -85,7 +95,11 @@
                   "description": "The password of the user."
                 }
               },
-              "required": ["email", "name", "password"]
+              "required": [
+                "email",
+                "name",
+                "password"
+              ]
             }
           }
         ],
@@ -192,7 +206,11 @@
                   "description": "The updated password of the user."
                 }
               },
-              "required": ["email", "name", "password"]
+              "required": [
+                "email",
+                "name",
+                "password"
+              ]
             }
           }
         ],
@@ -260,6 +278,160 @@
           }
         }
       }
+    },
+    "/products": {
+      "get": {
+        "summary": "Get all products (paginated)",
+        "description": "Returns a list of all products, paginated.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page number of the product list.",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The maximum number of products per page.",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          },
+          {
+            "name": "availableOnly",
+            "in": "query",
+            "description": "Flag to retrieve only available products.",
+            "required": false,
+            "type": "boolean",
+            "default": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of products.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Product"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid query parameters."
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Get a product by ID",
+        "description": "Returns a product by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the product.",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of the product.",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid product ID."
+          },
+          "404": {
+            "description": "Product not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a product by ID",
+        "description": "Updates the details of a product by its ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the product.",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The updated product details.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful update of the product.",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid or missing product details."
+          },
+          "401": {
+            "description": "Unauthorized. Missing orInvalid authentication token."
+          },
+          "500": {
+            "description": "Internal server error. Error updating the product."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a product by ID",
+        "description": "Deletes a product by its ID.",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The ID of the product.",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion of the product.",
+            "schema": {
+              "$ref": "#/definitions/Product"
+            }
+          },
+          "400": {
+            "description": "Bad request. Invalid product ID or product is already deleted."
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid authentication token."
+          },
+          "500": {
+            "description": "Internal server error. Error deleting the product."
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -277,6 +449,68 @@
         "email": {
           "type": "string",
           "description": "The email of the user."
+        }
+      }
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "The ID of the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "The price of the product."
+        },
+        "isAvailable": {
+          "type": "boolean",
+          "description": "Indicates whether the product is available or not."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the product was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the product was last updated."
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "The ID of the order."
+        },
+        "userId": {
+          "type": "integer",
+          "description": "The ID of the user who placed the order."
+        },
+        "productId": {
+          "type": "integer",
+          "description": "The ID of the product in the order."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the order was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the order was last updated."
         }
       }
     }
