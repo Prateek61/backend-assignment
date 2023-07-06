@@ -106,7 +106,7 @@ router.get('/sales/period', async (req, res) => {
 
 /**
  * @swagger
- * /sales/daterange:
+ * /reports/sales/daterange:
  *   get:
  *     summary: Get total sales within a date range
  *     description: Retrieve the total sales within a specified date range.
